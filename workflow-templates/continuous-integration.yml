@@ -1,0 +1,15 @@
+name: continuous integration
+
+on:
+  push:
+    branches-ignore:
+      - main
+      - staging
+      - 'release*'
+
+jobs:
+  continuous-integration:
+    uses: ./.github/workflows/maven_build.yml
+    secrets: inherit
+    with:
+      upload-artifacts: false
