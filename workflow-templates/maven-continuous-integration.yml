@@ -8,5 +8,5 @@ permissions:
 
 jobs:
   maven-build-lifecycle:
-    uses: ./.github/workflows/maven-build-lifecycle.yml
+    uses: energyhub/.github/workflows/maven-build-lifecycle.yml@main
     secrets: inherit
