@@ -7,22 +7,13 @@ on:
         required: true
       JFROG_PASSWORD:
         required: true
-      DOCKER_USER:
-        required: true
-      DOCKER_PASSWORD:
-        required: true
-      OCI_REGISTRY:
-        required: true
       AWS_ACCESS_KEY_ID:
         required: true
       AWS_SECRET_ACCESS_KEY:
         required: true
-      AWS_REGION:
-        required: true
-    inputs:
-      upload-artifacts:
-        required: true
-        type: boolean
+
+env:
+  AWS_REGION: us-east-1
 
 jobs:
   build-and-run-tests:
@@ -31,38 +22,38 @@ jobs:
     env:
       JFROG_USER: ${{ secrets.JFROG_USER }}
       JFROG_PASSWORD: ${{ secrets.JFROG_PASSWORD }}
-      OCI_REGISTRY: ${{ secrets.OCI_REGISTRY }}
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Cache local Maven repository
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           java-version: '17'
-          distribution: 'adopt'
-
-      - name: Checkout
-        uses: actions/checkout@v3
+          distribution: 'temurin'
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Login to Amazon ECR
+        id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Copy maven settings
+      - name: Configure maven settings to pull artifacts from JFrog
         run: cp etc/ci/home_m2_settings.xml $HOME/.m2/settings.xml
 
       - name: Build and Run tests
-        run:  make
-
-      - name: Upload server.jar
-        if: ${{ inputs.upload-artifacts }}
-        uses: actions/upload-artifact@v3
-        with:
-          name: server
-          path: server/target/server-*.jar
-          retention-days: 14
+        run:  mvn verify
