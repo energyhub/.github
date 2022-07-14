@@ -1,0 +1,12 @@
+name: continuous integration
+
+on:
+  push:
+
+permissions:
+  contents: read
+
+jobs:
+  maven-build-lifecycle:
+    uses: ./.github/workflows/maven-build-lifecycle.yml
+    secrets: inherit
