@@ -11,6 +11,15 @@ on:
         required: true
       AWS_SECRET_ACCESS_KEY:
         required: true
+    inputs:
+      upload-artifacts:
+        required: false
+        default: false
+        type: boolean
+      application-path:
+        required: false
+        default: server
+        type: string
 
 env:
   AWS_REGION: us-east-1
@@ -57,3 +66,11 @@ jobs:
 
       - name: Build and Run tests
         run:  mvn verify
+
+      - name: Upload application jar
+        if: ${{ inputs.upload-artifacts }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ inputs.application-path }}
+          path: ${{ inputs.application-path }}/target/*.jar
+          retention-days: 14
