@@ -14,7 +14,7 @@ on:
     inputs:
       ecr-repository:
         description: "Amazon ECR repository name, e.g. 'energyhub/mec', 'energyhub/uwp'"
-        required: true
+        required: false
         type: string
       upload-artifacts:
         description: "Upload artifact to Amazon ECR"
