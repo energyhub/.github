@@ -1,0 +1,45 @@
+# This workflow invokes a bash script which deploys an application to AWS ECS using CodeDeploy via CloudFormation
+# See an example of this file : https://github.com/energyhub/java-microservice-template/blob/main/etc/ci/deploy.sh
+name: Blue Green Deploy via AWS CodeDeploy
+
+on:
+  workflow_call:
+    secrets:
+      AWS_ACCESS_KEY_ID:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
+    inputs:
+      environment:
+        required: true
+        type: string
+      image-tag:
+        description: "Tag of the image to deploy"
+        required: true
+        type: string
+      vpc:
+        description: "VPC to deploy to, e.g. 'prod', 'qa-1', 'mec-rc', etc."
+        required: true
+        type: string
+
+env:
+  AWS_REGION: us-east-1
+
+jobs:
+  blue-green-deploy:
+    environment: ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+    name: blue-green-deploy
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy to AWS ECS
+        run: ./etc/ci/deploy.sh "${{ inputs.vpc }}" "${{ inputs.image-tag }}"
