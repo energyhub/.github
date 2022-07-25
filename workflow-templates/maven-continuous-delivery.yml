@@ -1,0 +1,96 @@
+name: Continuous Delivery
+
+on:
+  push:
+    branches:
+      - 'release-*'
+      - 'hotfix-*'
+      - main
+
+env:
+  ECR_REPOSITORY: "energyhub/jmt"                 # set this to your ECR repository
+  APPLICATION_PATH: "server"                      # update this iff the application path from root differs
+  STAGING_VPC: "jmt-staging"                      # set this to the VPC used for staging your project
+  RELEASE_CANDIDATE_VPC: "jmt-release-candidate"  # set this to the VPC used for evaluating release candidates for your project
+  PRODUCTION_VPC: "prod"
+
+jobs:
+  setup:
+    # Workaround to make environment variables available to invocations of reusable workflows
+    # https://github.community/t/reusable-workflow-env-context-not-available-in-jobs-job-id-with/206111
+    name: Setup
+    runs-on: ubuntu-latest
+    outputs:
+      ecr-repository: ${{ env.ECR_REPOSITORY }}
+      application-path: ${{env.APPLICATION_PATH }}
+      staging-vpc: ${{ env.STAGING_VPC }}
+      release-candidate-vpc: ${{ env.RELEASE_CANDIDATE_VPC }}
+      production-vpc: ${{ env.PRODUCTION_VPC }}
+    steps:
+      - run: exit 0
+
+  maven-build-lifecycle:
+    name: Build and Run Tests
+    uses: energyhub/.github/.github/workflows/maven-build-lifecycle.yml@main
+    needs: [ setup ]
+    secrets: inherit
+    with:
+      application-path: ${{ needs.setup.outputs.application-path }}
+      upload-artifacts: true
+      ecr-repository: ${{ needs.setup.outputs.ecr-repository }}
+
+  deploy-to-staging:
+    if: github.ref == 'refs/heads/main'
+    needs: [ setup, maven-build-lifecycle ]
+    name: Deploy to Staging
+    uses: energyhub/.github/.github/workflows/aws_ecs_deploy.yml@main
+    secrets: inherit
+    with:
+      environment: staging
+      vpc: ${{ needs.setup.outputs.staging-vpc }}
+      image-tag: ${{ needs.maven-build-lifecycle.outputs.image-tag }}
+
+  deploy-to-release-candidate:
+    if:  startsWith(github.ref_name, 'release') || startsWith(github.ref_name, 'hotfix')
+    needs: [ setup, maven-build-lifecycle ]
+    name: Deploy to Release Candidate
+    uses: energyhub/.github/.github/workflows/aws_ecs_deploy.yml@main
+    secrets: inherit
+    with:
+      environment: release-candidate
+      vpc: ${{ needs.setup.outputs.release-candidate-vpc }}
+      image-tag: ${{ needs.maven-build-lifecycle.outputs.image-tag }}
+
+  deploy-to-production:
+    if:  startsWith(github.ref_name, 'release') || startsWith(github.ref_name, 'hotfix')
+    needs: [ setup, maven-build-lifecycle, deploy-to-release-candidate ]
+    name: Deploy to Production
+    uses: energyhub/.github/.github/workflows/aws_ecs_deploy.yml@main
+    secrets: inherit
+    with:
+      environment: production
+      vpc: ${{ needs.setup.outputs.production-vpc }}
+      image-tag: ${{ needs.maven-build-lifecycle.outputs.image-tag }}
+
+  release:
+    if:  startsWith(github.ref_name, 'release') || startsWith(github.ref_name, 'hotfix')
+    needs: [ maven-build-lifecycle, deploy-to-production ]
+    name: Release Tasks
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REVISION: ${{ needs.maven-build-lifecycle.outputs.revision }}
+    steps:
+      - name: Create a Tag for Release
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.git.createRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: 'refs/tags/${{ env.REVISION }}',
+                sha: context.sha
+              })       
+
+      - name: Make a Release
+        run: gh release create "${REVISION}" -t "${REVISION}" --generate-notes -R energyhub/${{ github.event.repository.name }}
