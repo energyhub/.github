@@ -1,0 +1,9 @@
+{
+  "name": "EnergyHub Java Maven CD Workflow",
+  "description": "EnergyHub CD starter workflow for Java projects built with Maven and deployed to AWS ECS",
+  "iconName": "energyhub-logo",
+  "categories": [
+    "Java",
+    "Maven POM"
+  ]
+}
