@@ -12,7 +12,12 @@ on:
       AWS_SECRET_ACCESS_KEY:
         required: true
     inputs:
+      ecr-repository:
+        description: "Amazon ECR repository name, e.g. 'energyhub/mec', 'energyhub/uwp'"
+        required: false
+        type: string
       upload-artifacts:
+        description: "Upload artifact to Amazon ECR"
         required: false
         default: false
         type: boolean
@@ -20,6 +25,13 @@ on:
         required: false
         default: server
         type: string
+    outputs:
+      revision:
+        description: "The semantic version resolved from the pom file"
+        value: ${{ jobs.build-and-run-tests.outputs.revision }}
+      image-tag:
+        description: "The docker image tag"
+        value: ${{ jobs.build-and-run-tests.outputs.image-tag }}
 
 env:
   AWS_REGION: us-east-1
@@ -28,6 +40,9 @@ jobs:
   build-and-run-tests:
     runs-on: ubuntu-latest
     name: build-and-run-tests
+    outputs:
+      revision: ${{ steps.resolve-revision.outputs.revision }}
+      image-tag: ${{ steps.build-image.outputs.image-tag }}
     env:
       JFROG_USER: ${{ secrets.JFROG_USER }}
       JFROG_PASSWORD: ${{ secrets.JFROG_PASSWORD }}
@@ -35,6 +50,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
+      - name: Set a revision number
+        id: resolve-revision
+        run: echo "::set-output name=revision::$(source ./etc/ci/get_revision.sh && get_revision .)"
 
       - name: Cache local Maven repository
         uses: actions/cache@v3
@@ -67,10 +86,17 @@ jobs:
       - name: Build and Run tests
         run:  mvn verify
 
-      - name: Upload application jar
+      - name: Build, tag, and push image to Amazon ECR
+        id: build-image
         if: ${{ inputs.upload-artifacts }}
-        uses: actions/upload-artifact@v3
-        with:
-          name: ${{ inputs.application-path }}
-          path: ${{ inputs.application-path }}/target/*.jar
-          retention-days: 14
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ inputs.ecr-repository }}
+          IMAGE_TAG: ${{ steps.resolve-revision.outputs.revision }}-${{ github.run_number}}
+        run: |
+          # Build a docker container and
+          # push it to ECR so that it can
+          # be deployed to ECS.
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ${{ inputs.application-path }}
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "::set-output name=image-tag::$IMAGE_TAG"
