@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - 'release-*'
-      - 'hotfix-*'
       - main
 
 env:
@@ -51,7 +50,7 @@ jobs:
       image-tag: ${{ needs.maven-build-lifecycle.outputs.image-tag }}
 
   deploy-to-release-candidate:
-    if:  startsWith(github.ref_name, 'release') || startsWith(github.ref_name, 'hotfix')
+    if:  startsWith(github.ref_name, 'release')
     needs: [ setup, maven-build-lifecycle ]
     name: Deploy to Release Candidate
     uses: energyhub/.github/.github/workflows/aws_ecs_deploy.yml@main
@@ -62,7 +61,7 @@ jobs:
       image-tag: ${{ needs.maven-build-lifecycle.outputs.image-tag }}
 
   deploy-to-production:
-    if:  startsWith(github.ref_name, 'release') || startsWith(github.ref_name, 'hotfix')
+    if:  startsWith(github.ref_name, 'release')
     needs: [ setup, maven-build-lifecycle, deploy-to-release-candidate ]
     name: Deploy to Production
     uses: energyhub/.github/.github/workflows/aws_ecs_deploy.yml@main
@@ -73,10 +72,11 @@ jobs:
       image-tag: ${{ needs.maven-build-lifecycle.outputs.image-tag }}
 
   release:
-    if:  startsWith(github.ref_name, 'release') || startsWith(github.ref_name, 'hotfix')
+    if:  startsWith(github.ref_name, 'release')
     needs: [ maven-build-lifecycle, deploy-to-production ]
     name: Release Tasks
     runs-on: ubuntu-latest
+    environment: production
     env:
       GH_TOKEN: ${{ github.token }}
       REVISION: ${{ needs.maven-build-lifecycle.outputs.revision }}

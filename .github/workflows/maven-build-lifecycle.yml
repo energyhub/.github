@@ -17,10 +17,15 @@ on:
         required: false
         type: string
       upload-artifacts:
-        description: "Upload artifact to Amazon ECR"
+        description: "Upload build artifacts. Includes upload of docker image to Amazon ECR"
         required: false
         default: false
         type: boolean
+      artifact-paths:
+        description: "Paths of additional artifacts to upload, if applicable"
+        required: false
+        type: string
+        default: ""
       application-path:
         required: false
         default: server
@@ -84,7 +89,9 @@ jobs:
         run: cp etc/ci/home_m2_settings.xml $HOME/.m2/settings.xml
 
       - name: Build and Run tests
-        run:  mvn verify
+        env:
+          OCI_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: mvn verify
 
       - name: Build, tag, and push image to Amazon ECR
         id: build-image
@@ -100,6 +107,12 @@ jobs:
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ${{ inputs.application-path }}
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           echo "::set-output name=image-tag::$IMAGE_TAG"
+
+      - name: Upload artifacts from workflow
+        if: ${{ inputs.artifact-paths != '' && inputs.upload-artifacts }}
+        uses: actions/upload-artifact@v3
+        with:
+          path: ${{ inputs.artifact-paths }}
 
       - name: Upload reports to Codacy
         env:
