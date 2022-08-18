@@ -25,6 +25,7 @@ on:
         description: "Paths of additional artifacts to upload, if applicable"
         required: false
         type: string
+        default: ""
       application-path:
         required: false
         default: server
@@ -108,6 +109,7 @@ jobs:
           echo "::set-output name=image-tag::$IMAGE_TAG"
 
       - name: Upload artifacts from workflow
+        if: ${{ inputs.artifact-paths != '' && inputs.upload-artifacts }}
         uses: actions/upload-artifact@v3
         with:
           path: ${{ inputs.artifact-paths }}
