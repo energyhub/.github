@@ -91,7 +91,7 @@ jobs:
       - name: Build and Run tests
         env:
           OCI_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        run: mvn verify
+        run: mvn -B verify # -B runs maven in non-interactive mode and suppresses the download progress logs
 
       - name: Build, tag, and push image to Amazon ECR
         id: build-image
