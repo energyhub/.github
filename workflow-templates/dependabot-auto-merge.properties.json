@@ -1,0 +1,8 @@
+{
+  "name": "Dependabot Auto Merge Workflow",
+  "description": "Automatically approve and enable auto-merge for dependabot PRs which include patch or minor version upgrades.",
+  "iconName": "energyhub-logo",
+  "categories": [
+    "Automation"
+  ]
+}
