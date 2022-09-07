@@ -6,9 +6,6 @@
 name: Dependabot PR approval and auto-merge
 on:
   workflow_call:
-    secrets:
-      GITHUB_TOKEN:
-        required: true
 
 permissions:
   contents: write
