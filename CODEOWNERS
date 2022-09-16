@@ -1,0 +1,16 @@
+# See https://help.github.com/articles/about-codeowners/
+# for more info about the mechanics CODEOWNERS file
+
+# Our usage of this file diverges slightly from the
+# "code owners" idea that Github named it after.
+#
+# Instead, this file should be thought of as marking the
+# primary maintainers for this repo. So by adding this file
+# we are making sure the primary maintainers get an automatic
+#
+# "FYI, heads up that I'm making this PR"
+#
+# whenever someone makes a PR in this repo. This file does
+# not make it so that someone from the maintainer group
+# must approve the PR, despite Github hinting otherwise!
+* @energyhub/architecture
