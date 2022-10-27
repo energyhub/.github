@@ -85,9 +85,31 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Configure maven settings to pull artifacts from JFrog
-        run: cp etc/ci/home_m2_settings.xml $HOME/.m2/settings.xml
-
+      - name: Generate settings.xml for Maven Builds
+        uses: whelk-io/maven-settings-xml-action@v21
+        with:
+          repositories: >
+            [
+              {
+                "id": "releases",
+                "name": "libs-releases",
+                "url": "https://ehub.jfrog.io/artifactory/libs-release",
+                "releases": {
+                  "enabled": "true"
+                },
+                "snapshots": {
+                  "enabled": "false"
+                }
+              }
+            ]
+          servers: >
+            [
+              {
+                "id": "releases",
+                "username": "${env.JFROG_USER}",
+                "password": "${env.JFROG_PASSWORD}"
+              }
+            ]
       - name: Build and Run tests
         env:
           OCI_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
