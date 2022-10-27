@@ -1,0 +1,60 @@
+name: Run Maven Setup
+
+on:
+  workflow_call:
+    secrets:
+      JFROG_USER:
+        required: true
+      JFROG_PASSWORD:
+        required: true
+
+jobs:
+  setup-maven:
+    runs-on: ubuntu-latest
+    name: setup-maven
+    env:
+      JFROG_USER: ${{ secrets.JFROG_USER }}
+      JFROG_PASSWORD: ${{ secrets.JFROG_PASSWORD }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Cache local Maven repository
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Generate settings.xml for Maven Builds
+        uses: whelk-io/maven-settings-xml-action@v21
+        with:
+          repositories: >
+            [
+              {
+                "id": "releases",
+                "name": "libs-releases",
+                "url": "https://ehub.jfrog.io/artifactory/libs-release",
+                "releases": {
+                  "enabled": "true"
+                },
+                "snapshots": {
+                  "enabled": "false"
+                }
+              }
+            ]
+          servers: >
+            [
+              {
+                "id": "releases",
+                "username": "${env.JFROG_USER}",
+                "password": "${env.JFROG_PASSWORD}"
+              }
+            ]

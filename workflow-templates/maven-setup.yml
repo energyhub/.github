@@ -1,0 +1,12 @@
+name: Maven Setup
+
+on:
+  push:
+
+permissions:
+  contents: read
+
+jobs:
+  maven-build-lifecycle:
+    uses: energyhub/.github/.github/workflows/maven-setup.yml@main
+    secrets: inherit
