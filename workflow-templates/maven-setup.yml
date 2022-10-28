@@ -7,6 +7,6 @@ permissions:
   contents: read
 
 jobs:
-  maven-build-lifecycle:
+  maven-setup:
     uses: energyhub/.github/.github/workflows/maven-setup.yml@main
     secrets: inherit
