@@ -36,12 +36,28 @@ runs:
               "snapshots": {
                 "enabled": "false"
               }
+            },
+            {
+              "id": "snapshots",
+              "name": "libs-snapshots",
+              "url": "https://ehub.jfrog.io/artifactory/libs-snapshot",
+              "releases": {
+                "enabled": "false"
+              },
+              "snapshots": {
+                "enabled": "true"
+              }
             }
           ]
         servers: >
           [
             {
               "id": "releases",
+              "username": "${env.JFROG_USER}",
+              "password": "${env.JFROG_PASSWORD}"
+            },
+            {
+              "id": "snapshots",
               "username": "${env.JFROG_USER}",
               "password": "${env.JFROG_PASSWORD}"
             }
