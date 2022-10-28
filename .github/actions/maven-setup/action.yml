@@ -62,11 +62,11 @@ runs:
             {
               "id": "releases",
               "username": "${{ inputs.jfrog_user }}",
-              "password": "hi"
+              "password": "${{ inputs.jfrog_password }}"
             },
             {
               "id": "snapshots",
               "username": "${{ inputs.jfrog_user }}",
-              "password": "hi"
+              "password": "${{ inputs.jfrog_password }}"
             }
           ]
