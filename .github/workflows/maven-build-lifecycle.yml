@@ -54,7 +54,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Maven Setup
-        uses: ./github/actions/maven-setup
+        uses: energyhub/.github/.github/actions/maven-setup@cat_33_m2 # TODO change to main
         with:
           jfrog_user: ${{ secrets.JFROG_USER }}
           jfrog_password: ${{ secrets.JFROG_PASSWORD }}
