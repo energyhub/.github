@@ -53,7 +53,8 @@ runs:
                 "enabled": "false"
               },
               "snapshots": {
-                "enabled": "true"
+                "enabled": "true",
+                "updatePolicy": "interval:10"
               }
             }
           ]
