@@ -54,11 +54,11 @@ runs:
             {
               "id": "releases",
               "username": "${env.JFROG_USER}",
-              "password": "${env.JFROG_PASSWORD}"
+              "password": "hi"
             },
             {
               "id": "snapshots",
               "username": "${env.JFROG_USER}",
-              "password": "${env.JFROG_PASSWORD}"
+              "password": "hi"
             }
           ]
