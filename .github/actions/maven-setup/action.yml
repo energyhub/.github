@@ -1,6 +1,14 @@
 name: "Setup Maven"
 description: "Setup Maven"
 
+inputs:
+  jfrog_user:
+    description: JFrog username used to create the access key (password)
+    required: true
+  jfrog_password:
+    description: JFrog access key (password)
+    required: true
+
 runs:
   using: composite
   steps:
@@ -53,12 +61,12 @@ runs:
           [
             {
               "id": "releases",
-              "username": "${env.JFROG_USER}",
+              "username": "${{ inputs.jfrog_user }}",
               "password": "hi"
             },
             {
               "id": "snapshots",
-              "username": "${env.JFROG_USER}",
+              "username": "${{ inputs.jfrog_user }}",
               "password": "hi"
             }
           ]
