@@ -1,5 +1,5 @@
 name: "Setup Maven"
-description: "Setup Maven"
+description: "Setup JDK 17, maven cache, and JFrog credentials"
 
 inputs:
   jfrog_user:
@@ -12,9 +12,11 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
     - name: Cache local Maven repository
       uses: actions/cache@v3
       with:
@@ -22,13 +24,6 @@ runs:
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
         restore-keys: |
           ${{ runner.os }}-maven-
-
-    - name: Set up JDK 17
-      uses: actions/setup-java@v3
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-
     - name: Generate settings.xml for Maven Builds
       uses: whelk-io/maven-settings-xml-action@v21
       with:

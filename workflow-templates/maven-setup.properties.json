@@ -1,9 +1,0 @@
-{
-  "name": "EnergyHub Java Maven CI Workflow",
-  "description": "EnergyHub CI starter workflow for Java projects built with Maven",
-  "iconName": "energyhub-logo",
-  "categories": [
-    "Java",
-    "Maven POM"
-  ]
-}
