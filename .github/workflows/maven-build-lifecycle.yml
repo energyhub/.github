@@ -48,31 +48,20 @@ jobs:
     outputs:
       revision: ${{ steps.resolve-revision.outputs.revision }}
       image-tag: ${{ steps.build-image.outputs.image-tag }}
-    env:
-      JFROG_USER: ${{ secrets.JFROG_USER }}
-      JFROG_PASSWORD: ${{ secrets.JFROG_PASSWORD }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Maven Setup
+        uses: energyhub/.github/.github/actions/maven-setup@cat_33_m2 # TODO change to main
+        with:
+          jfrog_user: ${{ secrets.JFROG_USER }}
+          jfrog_password: ${{ secrets.JFROG_PASSWORD }}
+
       - name: Set a revision number
         id: resolve-revision
         run: echo "::set-output name=revision::$(source ./etc/ci/get_revision.sh && get_revision .)"
-
-      - name: Cache local Maven repository
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'temurin'
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -84,9 +73,6 @@ jobs:
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
-
-      - name: Configure maven settings to pull artifacts from JFrog
-        run: cp etc/ci/home_m2_settings.xml $HOME/.m2/settings.xml
 
       - name: Build and Run tests
         env:

@@ -1,0 +1,68 @@
+name: "Setup Maven"
+description: "Setup JDK 17, maven cache, and JFrog credentials"
+
+inputs:
+  jfrog_user:
+    description: JFrog username used to create the access key (password)
+    required: true
+  jfrog_password:
+    description: JFrog access key (password)
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+    - name: Cache local Maven repository
+      uses: actions/cache@v3
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-
+    - name: Generate settings.xml for Maven Builds
+      uses: whelk-io/maven-settings-xml-action@v21
+      with:
+        repositories: >
+          [
+            {
+              "id": "releases",
+              "name": "libs-releases",
+              "url": "https://ehub.jfrog.io/artifactory/libs-release",
+              "releases": {
+                "enabled": "true"
+              },
+              "snapshots": {
+                "enabled": "false"
+              }
+            },
+            {
+              "id": "snapshots",
+              "name": "libs-snapshots",
+              "url": "https://ehub.jfrog.io/artifactory/libs-snapshot",
+              "releases": {
+                "enabled": "false"
+              },
+              "snapshots": {
+                "enabled": "true",
+                "updatePolicy": "interval:10"
+              }
+            }
+          ]
+        servers: >
+          [
+            {
+              "id": "releases",
+              "username": "${{ inputs.jfrog_user }}",
+              "password": "${{ inputs.jfrog_password }}"
+            },
+            {
+              "id": "snapshots",
+              "username": "${{ inputs.jfrog_user }}",
+              "password": "${{ inputs.jfrog_password }}"
+            }
+          ]
