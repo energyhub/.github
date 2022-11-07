@@ -1,6 +1,16 @@
 name: "Setup Maven"
 description: "Setup JDK 17, maven cache, and JFrog credentials"
 
+inputs:
+  jfrog_user:
+    description: JFrog username used to create the access key (password)
+    required: true
+    default: ${{ secrets.JFROG_USER }}
+  jfrog_password:
+    description: JFrog access key (password)
+    required: true
+    default: ${{ secrets.JFROG_PASSWORD }}
+
 runs:
   using: composite
   steps:
@@ -49,12 +59,12 @@ runs:
           [
             {
               "id": "releases",
-              "username": "${{ secrets.JFROG_USER }}",
-              "password": "${{ secrets.JFROG_PASSWORD }}"
+              "username": "${{ inputs.jfrog_user }}",
+              "password": "${{ inputs.jfrog_password }}"
             },
             {
               "id": "snapshots",
-              "username": "${{ secrets.JFROG_USER }}",
-              "password": "${{ secrets.JFROG_PASSWORD }}"
+              "username": "${{ inputs.jfrog_user }}",
+              "password": "${{ inputs.jfrog_password }}"
             }
           ]
