@@ -3,8 +3,6 @@ name: Run Maven Build Lifecycle
 on:
   workflow_call:
     secrets:
-      JFROG_USER:
-        required: true
       JFROG_PASSWORD:
         required: true
       AWS_ACCESS_KEY_ID:
@@ -29,6 +27,9 @@ on:
       application-path:
         required: false
         default: server
+        type: string
+      jfrog-user:
+        required: true
         type: string
     outputs:
       revision:
@@ -56,8 +57,8 @@ jobs:
       - name: Maven Setup
         uses: energyhub/.github/.github/actions/maven-setup@main
         with:
-          jfrog_user: ${{ secrets.JFROG_USER }}
-          jfrog_password: ${{ secrets.JFROG_PASSWORD }}
+          jfrog-user: ${{ inputs.jfrog-user }}
+          jfrog-password: ${{ secrets.JFROG_PASSWORD }}
 
       - name: Set a revision number
         id: resolve-revision
