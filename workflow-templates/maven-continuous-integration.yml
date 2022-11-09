@@ -10,3 +10,5 @@ jobs:
   maven-build-lifecycle:
     uses: energyhub/.github/.github/workflows/maven-build-lifecycle.yml@main
     secrets: inherit
+    with:
+      jfrog-user: <REPLACE_ME>
