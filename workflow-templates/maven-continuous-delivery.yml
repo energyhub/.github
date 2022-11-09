@@ -12,6 +12,7 @@ env:
   STAGING_VPC: "jmt-staging"                      # set this to the VPC used for staging your project
   RELEASE_CANDIDATE_VPC: "jmt-release-candidate"  # set this to the VPC used for evaluating release candidates for your project
   PRODUCTION_VPC: "prod"
+  JFROG_USER: "github-java-microservice-template" # set this to the JFrog username used to create the access token
 
 jobs:
   setup:
@@ -25,6 +26,7 @@ jobs:
       staging-vpc: ${{ env.STAGING_VPC }}
       release-candidate-vpc: ${{ env.RELEASE_CANDIDATE_VPC }}
       production-vpc: ${{ env.PRODUCTION_VPC }}
+      jfrog-user: ${{ env.JFROG_USER }}
     steps:
       - run: exit 0
 
@@ -34,10 +36,10 @@ jobs:
     needs: [ setup ]
     secrets: inherit
     with:
-      jfrog-user: <REPLACE_ME>
       application-path: ${{ needs.setup.outputs.application-path }}
       upload-artifacts: true
       ecr-repository: ${{ needs.setup.outputs.ecr-repository }}
+      jfrog-user: ${{ needs.setup.outputs.jfrog-user }}
 
   deploy-to-staging:
     if: github.ref == 'refs/heads/main'
