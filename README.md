@@ -17,10 +17,14 @@ release from `main` and update the reference in your repository.
 
 For example,
 ```shell
+# one-time install
 brew install gh
+
+# run this whenever you want to release
+export $DOT_GITHUB_VERSION=v0.1.0 # change me to the next version
 git checkout main
 git pull
-git tag -a 2.3.0 -m "Add fun new action"
+git tag -a "${$DOT_GITHUB_VERSION}" -m "Add fun new action"
 git push origin 2.3.0
-gh release create 2.3.0 -t 2.3.0 --generate-notes -R energyhub/.github
+gh release create "${$DOT_GITHUB_VERSION}" -t "${$DOT_GITHUB_VERSION}" --generate-notes -R energyhub/.github
 ```
