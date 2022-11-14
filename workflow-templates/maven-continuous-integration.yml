@@ -3,10 +3,25 @@ name: Continuous Integration
 on:
   push:
 
+env:
+  JFROG_USER: "github-java-microservice-template" # set this to the JFrog username used to create the access token
+
 permissions:
   contents: read
 
 jobs:
+  setup:
+    # Workaround to make environment variables available to invocations of reusable workflows
+    # https://github.community/t/reusable-workflow-env-context-not-available-in-jobs-job-id-with/206111
+    name: Setup
+    runs-on: ubuntu-latest
+    outputs:
+      jfrog-user: ${{ env.JFROG_USER }}
+    steps:
+      - run: exit 0
+
   maven-build-lifecycle:
     uses: energyhub/.github/.github/workflows/maven-build-lifecycle.yml@main
     secrets: inherit
+    with:
+      jfrog-user: ${{ needs.setup.outputs.jfrog-user }}
