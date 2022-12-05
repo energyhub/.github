@@ -24,6 +24,8 @@ runs:
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
         restore-keys: |
           ${{ runner.os }}-maven-
+    - name: Checkout
+      uses: actions/checkout@v3
     - name: Generate settings.xml for Maven Builds
       shell: bash
       run: |
