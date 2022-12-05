@@ -24,15 +24,8 @@ runs:
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
         restore-keys: |
           ${{ runner.os }}-maven-
-#    - name: Checkout .github repository
-#      shell: bash
-#      run: |
-#        https://raw.githubusercontent.com/energyhub/.github/cat_49_remove_unapproved/
-    - name: Checkout
-      uses: actions/checkout@v3
     - name: Configure Maven
       shell: bash
       run: |
-        ls ${GITHUB_ACTION_PATH}/
         sed "s/{username}/${{ inputs.jfrog-user }}/;s/{access_token}/${{ inputs.jfrog-password }}/"\
           ${GITHUB_ACTION_PATH}/home_m2_settings.xml.template > $HOME/.m2/settings.xml

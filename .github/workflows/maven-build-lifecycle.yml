@@ -57,7 +57,7 @@ jobs:
           path: ./application/
 
       - name: Maven Setup
-        uses: energyhub/.github/.github/actions/maven-setup@cat_49_remove_unapproved
+        uses: energyhub/.github/.github/actions/maven-setup@main
         with:
           jfrog-user: ${{ inputs.jfrog-user }}
           jfrog-password: ${{ secrets.JFROG_PASSWORD }}
