@@ -78,7 +78,10 @@ jobs:
       - name: Build and Run tests
         env:
           OCI_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        run: mvn -B verify
+        run: |
+          pwd
+          ls .
+          mvn -B verify
 
       - name: Build, tag, and push image to Amazon ECR
         id: build-image

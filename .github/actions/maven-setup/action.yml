@@ -20,12 +20,10 @@ runs:
     - name: Cache local Maven repository
       uses: actions/cache@v3
       with:
-        path: ~/.m2/repository
+        path: $HOME/.m2/repository
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
         restore-keys: |
           ${{ runner.os }}-maven-
-    - name: Checkout
-      uses: actions/checkout@v3
     - name: Generate settings.xml for Maven Builds
       shell: bash
       run: |
