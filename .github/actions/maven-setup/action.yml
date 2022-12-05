@@ -33,5 +33,6 @@ runs:
     - name: Configure Maven
       shell: bash
       run: |
+        ls .github/actions/maven-setup/
         sed "s/{username}/${{ inputs.jfrog-user }}/;s/{access_token}/${{ inputs.jfrog-password }}/"\
-          ./home_m2_settings.xml.template > $HOME/.m2/settings.xml
+          ./.github/actions/maven-setup/home_m2_settings.xml.template > $HOME/.m2/settings.xml
