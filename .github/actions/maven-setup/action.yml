@@ -24,45 +24,11 @@ runs:
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
         restore-keys: |
           ${{ runner.os }}-maven-
-    - name: Generate settings.xml for Maven Builds
-      uses: whelk-io/maven-settings-xml-action@v21
+    - name: Checkout .github repository
+      uses: actions/checkout@v3
       with:
-        repositories: >
-          [
-            {
-              "id": "releases",
-              "name": "libs-releases",
-              "url": "https://ehub.jfrog.io/artifactory/libs-release",
-              "releases": {
-                "enabled": "true"
-              },
-              "snapshots": {
-                "enabled": "false"
-              }
-            },
-            {
-              "id": "snapshots",
-              "name": "libs-snapshots",
-              "url": "https://ehub.jfrog.io/artifactory/libs-snapshot",
-              "releases": {
-                "enabled": "false"
-              },
-              "snapshots": {
-                "enabled": "true",
-                "updatePolicy": "interval:10"
-              }
-            }
-          ]
-        servers: >
-          [
-            {
-              "id": "releases",
-              "username": "${{ inputs.jfrog-user }}",
-              "password": "${{ inputs.jfrog-password }}"
-            },
-            {
-              "id": "snapshots",
-              "username": "${{ inputs.jfrog-user }}",
-              "password": "${{ inputs.jfrog-password }}"
-            }
-          ]
+        repository: energyhub/.github
+        path: .github/
+    - name: Configure Maven
+      shell: bash
+      run: sed "s/{username}/${{ inputs.jfrog-user }}/;s/{access_token}/${{ inputs.jfrog-password }}/" .github/etc/ci/home_m2_settings.xml.template > $HOME/.m2/settings.xml
