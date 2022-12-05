@@ -93,7 +93,7 @@ jobs:
           # be deployed to ECS.
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ${{ inputs.application-path }}
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          run: echo "image-tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
+          echo "image-tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
 
       - name: Upload artifacts from workflow
         if: ${{ inputs.artifact-paths != '' && inputs.upload-artifacts }}
