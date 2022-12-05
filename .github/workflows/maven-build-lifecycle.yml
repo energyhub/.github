@@ -62,10 +62,10 @@ jobs:
 
       - name: Set a revision number
         id: resolve-revision
-        run: echo "::set-output name=revision::$(source ./etc/ci/get_revision.sh && get_revision .)"
+        run: echo "revision=$(source ./etc/ci/get_revision.sh && get_revision .)" >> $GITHUB_OUTPUT
 
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v1-node16
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -93,7 +93,7 @@ jobs:
           # be deployed to ECS.
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ${{ inputs.application-path }}
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          echo "::set-output name=image-tag::$IMAGE_TAG"
+          run: echo "image-tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
 
       - name: Upload artifacts from workflow
         if: ${{ inputs.artifact-paths != '' && inputs.upload-artifacts }}
