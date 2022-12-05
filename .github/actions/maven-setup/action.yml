@@ -24,7 +24,7 @@ runs:
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
         restore-keys: |
           ${{ runner.os }}-maven-
-    - name: Configure Maven
+    - name: Generate settings.xml for Maven Builds
       shell: bash
       run: |
         sed "s/{username}/${{ inputs.jfrog-user }}/;s/{access_token}/${{ inputs.jfrog-password }}/"\
