@@ -1,0 +1,52 @@
+name: "Deploy a CloudFormation Template"
+description: "Create/Update CloudFormation Stack using a template in https://github.com/energyhub/cloudformation"
+
+inputs:
+  aws-access-key-id:
+    description: AWS Access Key ID stored in GitHub Actions secrets
+    required: true
+  aws-secret-access-key:
+    description: AWS Secret Access Key stored in GitHub Actions secrets
+    required: true
+  aws-region:
+    description: AWS Region
+    required: false
+    default: us-east-1
+  infrautils-version:
+    description: Version of infrautils ECR image
+    required: true
+  cloudformation-templates-ref:
+    description: GitHub reference (branch, tag, commit) to the energyhub/cloudformation repository
+    required: false
+    default: main
+  cloudformation-template-file-name:
+    description: File path in https://github.com/energyhub/cloudformation/tree/main/templates to deploy
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Download CloudFormation template
+      uses: actions/checkout@v3
+      with:
+        repository: energyhub/cloudformation
+        ref: ${{ inputs.cloudformation-templates-ref }}
+    - name: Configure AWS Credentials to pull infrautils image
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ inputs.aws-access-key-id }}
+        aws-secret-access-key: ${{ inputs.aws-secret-access-key }}
+        aws-region: ${{ inputs.aws-region }}
+    - name: Pull infrautils ECR image
+      shell: bash
+      run: |
+        docker pull 689723035205.dkr.ecr.us-east-1.amazonaws.com/energyhub/infrautils:${{ inputs.infrautils-version }}
+        docker tag 689723035205.dkr.ecr.us-east-1.amazonaws.com/energyhub/infrautils:${{ inputs.infrautils-version }} infrautils
+    - name: Run infrautils command with credentials
+      shell: bash
+      run: |
+        docker run \
+          --env AWS_ACCESS_KEY_ID="${{ inputs.aws-access-key-id }}" \
+          --env AWS_SECRET_ACCESS_KEY="${{ inputs.aws-secret-access-key }}" \
+          infrautils \
+          cfn.deploy cloudformation/templates/${{ inputs.infrautils-command }}
