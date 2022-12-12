@@ -65,7 +65,7 @@ jobs:
         run: echo "revision=$(source ./etc/ci/get_revision.sh && get_revision .)" >> $GITHUB_OUTPUT
 
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1-node16
+        uses: aws-actions/configure-aws-credentials@v1.7.0
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
