@@ -27,3 +27,12 @@ git pull
 git tag -a "${DOT_GITHUB_VERSION}" -m "Add fun new action"
 gh release create "${DOT_GITHUB_VERSION}" -t "${DOT_GITHUB_VERSION}" --generate-notes -R energyhub/.github
 ```
+
+## Git Hooks
+
+The folder `.githooks` holds useful
+[git hooks](https://git-scm.com/docs/githooks) that can be reused in any of our
+repos.
+
+To install them you'll need [git v2.9 or higher](https://github.com/git/git/blob/master/Documentation/RelNotes/2.9.0.txt#L127-L128)
+copy the `.githooks` folder to the repo of your choice and run `git config core.hooksPath .githooks/` from within that repo.
