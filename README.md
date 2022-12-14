@@ -30,7 +30,7 @@ gh release create "${DOT_GITHUB_VERSION}" -t "${DOT_GITHUB_VERSION}" --generate-
 
 ## Git Hooks
 
-The folder `.githooks' holds useful
+The folder `.githooks` holds useful
 [git hooks](https://git-scm.com/docs/githooks) that can be reused in any of our
 repos.
 
