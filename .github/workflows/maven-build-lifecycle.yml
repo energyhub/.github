@@ -5,10 +5,6 @@ on:
     secrets:
       JFROG_PASSWORD:
         required: true
-      AWS_ACCESS_KEY_ID:
-        required: true
-      AWS_SECRET_ACCESS_KEY:
-        required: true
     inputs:
       ecr-repository:
         description: "Amazon ECR repository name, e.g. 'energyhub/mec', 'energyhub/uwp'"
@@ -39,8 +35,9 @@ on:
         description: "The docker image tag"
         value: ${{ jobs.build-and-run-tests.outputs.image-tag }}
 
-env:
-  AWS_REGION: us-east-1
+permissions:
+  contents: read
+  id-token: write
 
 jobs:
   build-and-run-tests:
@@ -64,12 +61,8 @@ jobs:
         id: resolve-revision
         run: echo "revision=$(source ./etc/ci/get_revision.sh && get_revision .)" >> $GITHUB_OUTPUT
 
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1-node16
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+      - name: Assume Actions IAM Role  
+        uses: energyhub/workflow-actions/assume-actions-role@v2.4.2
 
       - name: Login to Amazon ECR
         id: login-ecr
