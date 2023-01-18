@@ -1,3 +1,5 @@
+# This workflow installs infrautils (DevOps maintained infrastructure as service python package) from JFrog
+# and uses infrautils (boto3) to deploy a cloudformation stack update
 name: Infrautils CFN Deploy
 
 on:
@@ -21,9 +23,23 @@ on:
         description: "VPC to deploy to, e.g. 'prod', 'qa-1', 'mec-rc', etc."
         required: true
         type: string
+      templatedir:
+        description: "location of the cloudformation template"
+        type: string
+        required: false
+      templateparams:
+        description: "location of the cloudformation parameter overrides file"
+        type: string
+        required: false
 
 env:
-  AWS_REGION: us-east-1
+  TEMPLATE_DIR: {{ inputs.templatedir || cloudformation/templates }}
+  TEMPLATE_PARAMS: {{ inputs.templateparams || cloudformation/params }}
+  JFROG_PYPI_URI: ehub.jfrog.io/artifactory/api/pypi/pypi-all/simple
+
+permissions:
+  contents: read
+  id-token: write
 
 jobs:
   infrautils-cfn-deploy:
@@ -42,7 +58,7 @@ jobs:
       - name: Install infrautils
         run: |
           pip install infrautils \
-            -i https://ci-infra-utils:"${{ secrets.JFROG_PASSWORD }}"@ehub.jfrog.io/artifactory/api/pypi/pypi-all/simple
+            -i https://ci-infra-utils:"${{ secrets.JFROG_PASSWORD }}"@${{ env.JFROG_PYPI_URI }}
 
       - name: Assume Actions IAM Role
         uses: energyhub/workflow-actions/assume-actions-role@v2.4.2
@@ -50,6 +66,6 @@ jobs:
       - name: Deploy via Cloudformation
         run: |
           infrautils cfn.deploy \
-            -p cloudformation/params/"${{ inputs.vpc }}"/"${{ inputs.service }}".yaml \
-            -t cloudformation/templates/"${{ inputs.service }}".yaml \
+            -p ${{ env.PARAMS_DIR }}/"${{ inputs.vpc }}"/"${{ inputs.service }}".yaml \
+            -t ${{ env.TEMPLATE_DIR }}/"${{ inputs.service }}".yaml \
             -e ImageTag="${{ inputs.image-tag }}"
