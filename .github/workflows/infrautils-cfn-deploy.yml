@@ -33,13 +33,23 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
       - name: Install Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
+
       - name: Install infrautils
-        run: pip install infrautils -i https://ci-infra-utils:"${{ secrets.JFROG_PASSWORD }}"@ehub.jfrog.io/artifactory/api/pypi/pypi-all/simple
+        run: |
+          pip install infrautils \
+            -i https://ci-infra-utils:"${{ secrets.JFROG_PASSWORD }}"@ehub.jfrog.io/artifactory/api/pypi/pypi-all/simple
+
       - name: Assume Actions IAM Role
         uses: energyhub/workflow-actions/assume-actions-role@v2.4.2
+
       - name: Deploy via Cloudformation
-        run: infrautils cfn.deploy -p cloudformation/params/"${{ inputs.vpc }}"/"${{ inputs.service }}".yaml -t cloudformation/templates/"${{ inputs.service }}".yaml -e ImageTag="${{ inputs.image-tag }}"
+        run: |
+          infrautils cfn.deploy \
+	    -p cloudformation/params/"${{ inputs.vpc }}"/"${{ inputs.service }}".yaml \
+            -t cloudformation/templates/"${{ inputs.service }}".yaml \
+            -e ImageTag="${{ inputs.image-tag }}"
