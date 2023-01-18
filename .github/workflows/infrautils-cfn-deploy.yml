@@ -50,6 +50,6 @@ jobs:
       - name: Deploy via Cloudformation
         run: |
           infrautils cfn.deploy \
-	    -p cloudformation/params/"${{ inputs.vpc }}"/"${{ inputs.service }}".yaml \
+            -p cloudformation/params/"${{ inputs.vpc }}"/"${{ inputs.service }}".yaml \
             -t cloudformation/templates/"${{ inputs.service }}".yaml \
             -e ImageTag="${{ inputs.image-tag }}"
