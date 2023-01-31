@@ -6,13 +6,9 @@ name: Infrautils CFN Deploy
 on:
   workflow_call:
     secrets:
-      JFROG_CI_PASSWORD:
+      JFROG_PYPI_PASSWORD:
         required: true
     inputs:
-      service:
-        description: "Name of the service to be deployed"
-        required: true
-        type: string
       image-tag:
         description: "Tag of the image to deploy"
         required: true
@@ -31,7 +27,6 @@ permissions:
 
 jobs:
   infrautils-cfn-deploy:
-    environment: ${{ inputs.environment }}
     runs-on: ubuntu-latest
     name: infrautils-EDX-cfn-deploy
     steps:
@@ -46,7 +41,7 @@ jobs:
       - name: Install infrautils
         run: |
           pip install infrautils \
-            -i https://ci-infra-utils:${{ secrets.JFROG_PASSWORD }}@${{ env.JFROG_PYPI_URI }}
+            -i https://ci-infra-utils:${{ secrets.JFROG_PYPI_PASSWORD }}@${{ env.JFROG_PYPI_URI }}
       - name: Assume Actions IAM Role
         uses: energyhub/workflow-actions/assume-actions-role@v2.4.2
 
