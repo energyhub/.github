@@ -1,7 +1,7 @@
 # This workflow installs infrautils (DevOps maintained infrastructure as service python package) from JFrog
 # and uses infrautils (boto3) to deploy a EDX via cloudformation stack update
 # https://github.com/energyhub/infra-utils
-name: Infrautils CFN Deploy
+name: Infrautils EDX CFN Deploy
 
 on:
   workflow_call:
