@@ -25,14 +25,13 @@ on:
         description: "location of the cloudformation template"
         type: string
         required: false
-      templateparams:
-        description: "location of the cloudformation parameter overrides file"
+      parameter-overrides:
+        description: "Any additional parameter overrides, e.g. '-e DesiredTasks=6 -e TaskMem=4096'"
         type: string
         required: false
 
 env:
   TEMPLATE_DIR: {{ inputs.templatedir || cloudformation/templates }}
-  TEMPLATE_PARAMS: {{ inputs.templateparams || cloudformation/params }}
   JFROG_PYPI_URI: ehub.jfrog.io/artifactory/api/pypi/pypi-all/simple
 
 permissions:
@@ -64,7 +63,9 @@ jobs:
       - name: Deploy via Cloudformation
         run: |
           infrautils cfn.deploy \
-            -p ${{ env.PARAMS_DIR }}/${{ inputs.vpc }}/${{ inputs.service }}.yaml \
+            -s ${{ inputs.vpc }}-${{ inputs.service }} \
             -t ${{ env.TEMPLATE_DIR }}/${{ inputs.service }}.yaml \
-            -e ImageTag="${{ inputs.image-tag }}" \
-            -e DeploymentRegister=$(date --iso-8601=seconds)
+            -e Env=${{ inputs.vpc }}  \
+            -e ImageTag=${{ inputs.image-tag }} \
+            -e DeploymentRegister=$(date --iso-8601=seconds) \
+            ${{ inputs.parameter-overrides }}
