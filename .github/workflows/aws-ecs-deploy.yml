@@ -16,6 +16,11 @@ on:
         description: "VPC to deploy to, e.g. 'prod', 'qa-1', 'mec-rc', etc."
         required: true
         type: string
+      session-duration-seconds:
+        description: "Session duration for assume actions role"
+        required: false
+        default: 3600
+        type: string
 
 permissions:
   contents: read
@@ -32,6 +37,8 @@ jobs:
 
       - name: Assume Actions IAM Role  
         uses: energyhub/workflow-actions/assume-actions-role@v2.4.2
+        with:
+          session-duration-seconds: ${{ inputs.session-duration-seconds }}
 
       - name: Deploy to AWS ECS
         run: ./etc/ci/deploy.sh "${{ inputs.vpc }}" "${{ inputs.image-tag }}"
