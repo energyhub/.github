@@ -36,7 +36,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Assume Actions IAM Role  
-        uses: energyhub/workflow-actions/assume-actions-role@v2.4.2
+        uses: energyhub/workflow-actions/assume-actions-role@v2.5.0
         with:
           session-duration-seconds: ${{ inputs.session-duration-seconds }}
 
