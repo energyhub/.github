@@ -1,6 +1,6 @@
 # This workflow installs infrautils (DevOps maintained infrastructure as service python package) from JFrog
 # and uses infrautils (boto3) to deploy a cloudformation stack update
-# directly from the java microservice template in S3
+# directly from the ecs-alb generic microservice template in S3
 # https://github.com/energyhub/infra-utils
 name: Infrautils CFN Deploy
 
