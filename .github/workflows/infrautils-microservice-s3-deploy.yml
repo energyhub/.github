@@ -22,10 +22,6 @@ on:
         description: "VPC to deploy to, e.g. 'prod', 'qa-1', 'mec-rc', etc."
         required: true
         type: string
-      templatedir:
-        description: "location of the cloudformation template"
-        type: string
-        required: false
       parameter-overrides:
         description: "Any additional parameter overrides, e.g. '-e DesiredTasks=6 -e TaskMem=4096'"
         type: string
