@@ -1,0 +1,70 @@
+# This workflow installs infrautils (DevOps maintained infrastructure as service python package) from JFrog
+# and uses infrautils (boto3) to deploy a cloudformation stack update
+# directly from the java microservice template in S3
+# https://github.com/energyhub/infra-utils
+name: Infrautils CFN Deploy
+
+on:
+  workflow_call:
+    secrets:
+      JFROG_PYPI_PASSWORD:
+        required: true
+    inputs:
+      service:
+        description: "Name of the service to be deployed"
+        required: true
+        type: string
+      image-tag:
+        description: "Tag of the image to deploy"
+        required: true
+        type: string
+      vpc:
+        description: "VPC to deploy to, e.g. 'prod', 'qa-1', 'mec-rc', etc."
+        required: true
+        type: string
+      templatedir:
+        description: "location of the cloudformation template"
+        type: string
+        required: false
+      parameter-overrides:
+        description: "Any additional parameter overrides, e.g. '-e DesiredTasks=6 -e TaskMem=4096'"
+        type: string
+        required: false
+
+env:
+  JFROG_PYPI_URI: ehub.jfrog.io/artifactory/api/pypi/pypi-all/simple
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  infrautils-cfn-deploy:
+    runs-on: ubuntu-latest
+    name: infrautils-cfn-deploy
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install infrautils
+        run: |
+          pip install infrautils \
+            -i https://ci-infra-utils:${{ secrets.JFROG_PYPI_PASSWORD }}@${{ env.JFROG_PYPI_URI }}
+
+      - name: Assume Actions IAM Role
+        uses: energyhub/workflow-actions/assume-actions-role@v2.4.2
+
+      - name: Deploy via Cloudformation
+        run: |
+          infrautils cfn.deploy \
+            -s ${{ inputs.vpc }}-${{ inputs.service }} \
+            -t https://infradata.s3.amazonaws.com/cloudformation/templates/microservices/ecs-alb-microservice.yaml \
+            -e Env=${{ inputs.vpc }}  \
+            -e ImageTag=${{ inputs.image-tag }} \
+            -e DeploymentRegister=$(date --iso-8601=seconds) \
+            ${{ inputs.parameter-overrides }}
