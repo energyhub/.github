@@ -62,5 +62,6 @@ jobs:
             -t https://infradata.s3.amazonaws.com/cloudformation/templates/microservices/ecs-alb-microservice.yaml \
             -e Env=${{ inputs.vpc }}  \
             -e ImageTag=${{ inputs.image-tag }} \
+            -e AppRef=${{ inputs.service }} \
             -e DeploymentRegister=$(date --iso-8601=seconds) \
             ${{ inputs.parameter-overrides }}
