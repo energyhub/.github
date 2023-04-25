@@ -60,6 +60,7 @@ jobs:
           infrautils cfn.deploy \
             -s ${{ inputs.vpc }}-${{ inputs.service }} \
             -t https://infradata.s3.amazonaws.com/cloudformation/templates/microservices/ecs-alb-microservice.yaml \
+            -r deploy-${{ inputs.service }}-role \
             -e Env=${{ inputs.vpc }}  \
             -e ImageTag=${{ inputs.image-tag }} \
             -e AppRef=${{ inputs.service }} \
