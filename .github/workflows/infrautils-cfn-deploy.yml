@@ -63,6 +63,7 @@ jobs:
           infrautils cfn.deploy \
             -s ${{ inputs.vpc }}-${{ inputs.service }} \
             -t ${{ inputs.templatedir }}/${{ inputs.service }}.yaml \
+            -r deploy-${{ inputs.service }}-role \
             -e Env=${{ inputs.vpc }}  \
             -e ImageTag=${{ inputs.image-tag }} \
             -e DeploymentRegister=$(date --iso-8601=seconds) \
