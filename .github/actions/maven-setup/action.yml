@@ -15,10 +15,10 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Set up JDK ${inputs.jdk-version}
+    - name: Set up JDK ${{ inputs.jdk-version }}
       uses: actions/setup-java@v3
       with:
-        java-version: ${inputs.jdk-version}
+        java-version: ${{ inputs.jdk-version }}
         distribution: "temurin"
         cache: "maven"
     - name: Generate settings.xml for Maven Builds
