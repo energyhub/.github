@@ -22,6 +22,11 @@ on:
         description: "VPC to deploy to, e.g. 'prod', 'qa-1', 'mec-rc', etc."
         required: true
         type: string
+      template-path:
+        description: "The path to the template file inside of the cloudformation project"
+        required: false
+        type: string
+        default: "microservices/ecs-alb-microservice.yaml"
       parameter-overrides:
         description: "Any additional parameter overrides, e.g. '-e DesiredTasks=6 -e TaskMem=4096'"
         type: string
@@ -59,7 +64,7 @@ jobs:
         run: |
           infrautils cfn.deploy \
             -s ${{ inputs.vpc }}-${{ inputs.service }} \
-            -t https://infradata.s3.amazonaws.com/cloudformation/templates/microservices/ecs-alb-microservice.yaml \
+            -t https://infradata.s3.amazonaws.com/cloudformation/templates/${{ inputs.template-path }} \
             -r deploy-${{ inputs.service }}-role \
             -e Env=${{ inputs.vpc }}  \
             -e ImageTag=${{ inputs.image-tag }} \
