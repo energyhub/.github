@@ -1,5 +1,5 @@
 name: "Setup Maven"
-description: "Setup JDK 17, maven cache, and JFrog credentials"
+description: "Setup JDK (defaults to 17), Maven cache, and JFrog credentials."
 
 inputs:
   jfrog-user:
@@ -8,14 +8,17 @@ inputs:
   jfrog-password:
     description: JFrog access key (password)
     required: true
+  jdk-version:
+    description: The JDK version to use
+    default: "17"
 
 runs:
   using: composite
   steps:
-    - name: Set up JDK 17
+    - name: Set up JDK ${{ inputs.jdk-version }}
       uses: actions/setup-java@v3
       with:
-        java-version: "17"
+        java-version: ${{ inputs.jdk-version }}
         distribution: "temurin"
         cache: "maven"
     - name: Generate settings.xml for Maven Builds
