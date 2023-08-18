@@ -11,7 +11,7 @@ on:
         required: true
     inputs:
       environment:
-        required: false
+        required: true
         type: string
       service:
         description: "Name of the service to be deployed"
@@ -43,41 +43,7 @@ permissions:
   id-token: write
 
 jobs:
-  infrautils-cfn-deploy-without-environment:
-    if: inputs.environment == ''
-    runs-on: ubuntu-latest
-    name: infrautils-cfn-deploy
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Install Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
-
-      - name: Install infrautils
-        run: |
-          pip install infrautils \
-            -i https://ci-infra-utils:${{ secrets.JFROG_PYPI_PASSWORD }}@${{ env.JFROG_PYPI_URI }}
-
-      - name: Assume Actions IAM Role
-        uses: energyhub/workflow-actions/assume-actions-role@v2.4.2
-
-      - name: Deploy via Cloudformation
-        run: |
-          infrautils cfn.deploy \
-            -s ${{ inputs.vpc }}-${{ inputs.service }} \
-            -t https://infradata.s3.amazonaws.com/cloudformation/templates/${{ inputs.template-path }} \
-            -r deploy-${{ inputs.service }}-role \
-            -e Env=${{ inputs.vpc }}  \
-            -e ImageTag=${{ inputs.image-tag }} \
-            -e AppRef=${{ inputs.service }} \
-            -e DeploymentRegister=$(date --iso-8601=seconds) \
-            ${{ inputs.parameter-overrides }}
-
-  infrautils-cfn-deploy-with-environment:
-    if: inputs.environment != ''
+  infrautils-cfn-deploy:
     environment: ${{ inputs.environment }}
     runs-on: ubuntu-latest
     name: infrautils-cfn-deploy
