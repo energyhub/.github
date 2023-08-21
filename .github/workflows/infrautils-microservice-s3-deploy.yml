@@ -10,6 +10,9 @@ on:
       JFROG_PYPI_PASSWORD:
         required: true
     inputs:
+      environment:
+        required: true
+        type: string
       service:
         description: "Name of the service to be deployed"
         required: true
@@ -41,6 +44,7 @@ permissions:
 
 jobs:
   infrautils-cfn-deploy:
+    environment: ${{ inputs.environment }}
     runs-on: ubuntu-latest
     name: infrautils-cfn-deploy
     steps:
