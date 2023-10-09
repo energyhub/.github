@@ -13,5 +13,5 @@ permissions:
 jobs:
   dependabot:
     if: ${{ github.actor == 'dependabot[bot]' }}
-    uses: energyhub/.github/.github/workflows/dependabot-auto-merge.yml@main
+    uses: energyhub/workflow-auto-merge-dependabot/.github/workflows/workflow.yml@v1
     secrets: inherit
