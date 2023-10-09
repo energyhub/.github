@@ -9,6 +9,7 @@ on:
 env:
   ECR_REPOSITORY: "energyhub/jmt"                 # set this to your ECR repository
   APPLICATION_PATH: "server"                      # update this iff the application path from root differs
+  SERVICE: "jmt"                                  # set this to your service name
   STAGING_VPC: "jmt-staging"                      # set this to the VPC used for staging your project
   RELEASE_CANDIDATE_VPC: "jmt-release-candidate"  # set this to the VPC used for evaluating release candidates for your project
   PRODUCTION_VPC: "prod"
@@ -23,6 +24,7 @@ jobs:
     outputs:
       ecr-repository: ${{ env.ECR_REPOSITORY }}
       application-path: ${{env.APPLICATION_PATH }}
+      service: ${{env.SERVICE}}
       staging-vpc: ${{ env.STAGING_VPC }}
       release-candidate-vpc: ${{ env.RELEASE_CANDIDATE_VPC }}
       production-vpc: ${{ env.PRODUCTION_VPC }}
@@ -32,7 +34,7 @@ jobs:
 
   maven-build-lifecycle:
     name: Build and Run Tests
-    uses: energyhub/.github/.github/workflows/maven-build-lifecycle.yml@main
+    uses: energyhub/workflow-maven-build-lifecycle/.github/workflows/workflow.yml@v1
     needs: [ setup ]
     secrets: inherit
     with:
@@ -45,10 +47,11 @@ jobs:
     if: github.ref == 'refs/heads/main'
     needs: [ setup, maven-build-lifecycle ]
     name: Deploy to Staging
-    uses: energyhub/.github/.github/workflows/aws-ecs-deploy.yml@main
+    uses: energyhub/workflow-deploy-infrautils-microservice-s3/.github/workflows/workflow.yml@v1
     secrets: inherit
     with:
       environment: staging
+      service: ${{ needs.setup.outputs.service }}
       vpc: ${{ needs.setup.outputs.staging-vpc }}
       image-tag: ${{ needs.maven-build-lifecycle.outputs.image-tag }}
 
@@ -56,10 +59,11 @@ jobs:
     if:  startsWith(github.ref_name, 'release')
     needs: [ setup, maven-build-lifecycle ]
     name: Deploy to Release Candidate
-    uses: energyhub/.github/.github/workflows/aws-ecs-deploy.yml@main
+    uses: energyhub/workflow-deploy-infrautils-microservice-s3/.github/workflows/workflow.yml@v1
     secrets: inherit
     with:
       environment: release-candidate
+      service: ${{ needs.setup.outputs.service }}
       vpc: ${{ needs.setup.outputs.release-candidate-vpc }}
       image-tag: ${{ needs.maven-build-lifecycle.outputs.image-tag }}
 
@@ -67,10 +71,11 @@ jobs:
     if:  startsWith(github.ref_name, 'release')
     needs: [ setup, maven-build-lifecycle, deploy-to-release-candidate ]
     name: Deploy to Production
-    uses: energyhub/.github/.github/workflows/aws-ecs-deploy.yml@main
+    uses: energyhub/workflow-deploy-infrautils-microservice-s3/.github/workflows/workflow.yml@v1
     secrets: inherit
     with:
       environment: production
+      service: ${{ needs.setup.outputs.service }}
       vpc: ${{ needs.setup.outputs.production-vpc }}
       image-tag: ${{ needs.maven-build-lifecycle.outputs.image-tag }}
 

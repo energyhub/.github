@@ -21,7 +21,7 @@ jobs:
       - run: exit 0
 
   maven-build-lifecycle:
-    uses: energyhub/.github/.github/workflows/maven-build-lifecycle.yml@main
+    uses: energyhub/workflow-maven-build-lifecycle/.github/workflows/workflow.yml@v1
     secrets: inherit
     with:
       jfrog-user: ${{ needs.setup.outputs.jfrog-user }}
