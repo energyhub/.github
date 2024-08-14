@@ -8,6 +8,6 @@ What this PR includes
 ----
 Brief description of what was done to meet the PR goal.
 
-How to test / verify these changes
+How this change was tested
 ----
-This is an optional section! Only include it if applicable.
+Describe testing done on the change, or why this is not applicable.
