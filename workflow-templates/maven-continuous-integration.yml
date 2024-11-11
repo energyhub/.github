@@ -14,7 +14,7 @@ jobs:
     # Workaround to make environment variables available to invocations of reusable workflows
     # https://github.community/t/reusable-workflow-env-context-not-available-in-jobs-job-id-with/206111
     name: Setup
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     outputs:
       jfrog-user: ${{ env.JFROG_USER }}
     steps:
