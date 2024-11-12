@@ -20,7 +20,7 @@ jobs:
     # Workaround to make environment variables available to invocations of reusable workflows
     # https://github.community/t/reusable-workflow-env-context-not-available-in-jobs-job-id-with/206111
     name: Setup
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     outputs:
       ecr-repository: ${{ env.ECR_REPOSITORY }}
       application-path: ${{env.APPLICATION_PATH }}
@@ -83,7 +83,7 @@ jobs:
     if:  startsWith(github.ref_name, 'release')
     needs: [ maven-build-lifecycle, deploy-to-production ]
     name: Release Tasks
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     environment: production
     env:
       GH_TOKEN: ${{ github.token }}
