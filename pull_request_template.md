@@ -5,8 +5,8 @@ Why this PR is needed
 <!-- Add a sentence or two on the reason this PR exists. Remember that the reviewer likely doesn't have as much context as you. Help them help you. -->
 
 
-
-Jira ticket reference: PIT-XXX
+<!-- Github will auto-link to Jira if configured correctly in repo settings --> 
+Jira ticket reference: PRJ-XXX
 
 What this PR includes
 ---------------------
