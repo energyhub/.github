@@ -26,6 +26,7 @@ Did You Think About
 - Monitoring?
 - Metrics and logging to diagnose problems?
 - Documentation?
+- Security, access control, PII?
 -->
 
 <!-- @formatter:on -->
