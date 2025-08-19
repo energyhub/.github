@@ -13,12 +13,13 @@ What this PR includes
 <!-- Brief description of what was done to meet the PR goal. -->
 
 
-End-to-End Testing
-------------------
+How this change is ready for production release
+-----------------------------------------------
 <!-- Required. Select one of these checkboxes, otherwise merging will be blocked. -->
 <!-- e2e-testing:start -->
-- [ ] End-to-end tests ran and passed
-- [ ] [Release exemption](https://energyhub.slack.com/archives/C098SCVCP55) granted
+- [ ] End-to-end tests ran and passed, or
+- [ ] [Release exemption](https://energyhub.slack.com/archives/C098SCVCP55) granted: [link here](), or
+- [ ] Not releasing to production
 <!-- e2e-testing:end -->
 
 How this change was tested
