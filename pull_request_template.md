@@ -15,6 +15,7 @@ What this PR includes
 
 End-to-End Testing
 ------------------
+<!-- Required. Select one of these checkboxes, otherwise merging will be blocked. -->
 <!-- e2e-testing:start -->
 - [ ] End-to-end tests ran and passed
 - [ ] [Release exemption](https://energyhub.slack.com/archives/C098SCVCP55) granted
