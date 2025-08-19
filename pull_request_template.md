@@ -13,6 +13,12 @@ What this PR includes
 <!-- Brief description of what was done to meet the PR goal. -->
 
 
+End-to-End Testing
+------------------
+<!-- e2e-testing:start -->
+- [ ] End-to-end tests ran and passed
+- [ ] [Release exemption](https://energyhub.slack.com/archives/C098SCVCP55) granted
+<!-- e2e-testing:end -->
 
 How this change was tested
 --------------------------
