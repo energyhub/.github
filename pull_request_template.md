@@ -19,7 +19,7 @@ How this change is ready for production release
 <!-- e2e-testing:start -->
 - [ ] End-to-end tests ran and passed, or
 - [ ] [Release exemption](https://energyhub.slack.com/archives/C098SCVCP55) granted: [link here](), or
-- [ ] Not releasing to production
+- [ ] N/A, please explain
 <!-- e2e-testing:end -->
 
 How this change was tested
