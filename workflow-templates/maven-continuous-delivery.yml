@@ -3,17 +3,14 @@ name: Continuous Delivery
 on:
   push:
     branches:
-      - 'release-*'
       - main
 
 env:
-  ECR_REPOSITORY: "energyhub/jmt"                 # set this to your ECR repository
-  APPLICATION_PATH: "server"                      # update this iff the application path from root differs
-  SERVICE: "jmt"                                  # set this to your service name
-  STAGING_VPC: "jmt-staging"                      # set this to the VPC used for staging your project
-  RELEASE_CANDIDATE_VPC: "jmt-release-candidate"  # set this to the VPC used for evaluating release candidates for your project
-  PRODUCTION_VPC: "prod"
-  JFROG_USER: "github-java-microservice-template" # set this to the JFrog username used to create the access token
+  APP_REF: "jmt"                                     # set this to your service name / application reference
+  APPLICATION_PATH: "server"                         # update this iff the application path from root differs
+  JFROG_USER: "github-java-microservice-template"    # set this to the JFrog username used to create the access token
+  # SLACK_PROD_DEPLOY_NOTIFY_WEBHOOK: ""             # uncomment and set to Slack webhook for prod deploy notifications
+  # SLACK_FAILURE_NOTIFY_WEBHOOK: ""                 # uncomment and set to Slack webhook for deploy failure notifications
 
 jobs:
   setup:
@@ -22,13 +19,11 @@ jobs:
     name: Setup
     runs-on: ubuntu-24.04
     outputs:
-      ecr-repository: ${{ env.ECR_REPOSITORY }}
-      application-path: ${{env.APPLICATION_PATH }}
-      service: ${{env.SERVICE}}
-      staging-vpc: ${{ env.STAGING_VPC }}
-      release-candidate-vpc: ${{ env.RELEASE_CANDIDATE_VPC }}
-      production-vpc: ${{ env.PRODUCTION_VPC }}
+      application-path: ${{ env.APPLICATION_PATH }}
+      app-ref: ${{ env.APP_REF }}
       jfrog-user: ${{ env.JFROG_USER }}
+      # slack-prod-deploy-webhook: ${{ env.SLACK_PROD_DEPLOY_NOTIFY_WEBHOOK }}
+      # slack-failure-webhook: ${{ env.SLACK_FAILURE_NOTIFY_WEBHOOK }}
     steps:
       - run: exit 0
 
@@ -38,67 +33,18 @@ jobs:
     needs: [ setup ]
     secrets: inherit
     with:
+      jfrog-user: ${{ needs.setup.outputs.jfrog-user }}
       application-path: ${{ needs.setup.outputs.application-path }}
       upload-artifacts: true
-      ecr-repository: ${{ needs.setup.outputs.ecr-repository }}
-      jfrog-user: ${{ needs.setup.outputs.jfrog-user }}
+      ecr-repository: energyhub/${{ needs.setup.outputs.app-ref }}
 
-  deploy-to-staging:
-    if: github.ref == 'refs/heads/main'
+  continuous-deployment:
     needs: [ setup, maven-build-lifecycle ]
-    name: Deploy to Staging
-    uses: energyhub/workflow-deploy-infrautils-microservice-s3/.github/workflows/workflow.yml@v1
+    name: Deploy service
+    uses: energyhub/workflow-deploy-pipeline/.github/workflows/workflow.yml@v1
     secrets: inherit
     with:
-      environment: staging
-      service: ${{ needs.setup.outputs.service }}
-      vpc: ${{ needs.setup.outputs.staging-vpc }}
+      service: ${{ needs.setup.outputs.app-ref }}
       image-tag: ${{ needs.maven-build-lifecycle.outputs.image-tag }}
-
-  deploy-to-release-candidate:
-    if:  startsWith(github.ref_name, 'release')
-    needs: [ setup, maven-build-lifecycle ]
-    name: Deploy to Release Candidate
-    uses: energyhub/workflow-deploy-infrautils-microservice-s3/.github/workflows/workflow.yml@v1
-    secrets: inherit
-    with:
-      environment: release-candidate
-      service: ${{ needs.setup.outputs.service }}
-      vpc: ${{ needs.setup.outputs.release-candidate-vpc }}
-      image-tag: ${{ needs.maven-build-lifecycle.outputs.image-tag }}
-
-  deploy-to-production:
-    if:  startsWith(github.ref_name, 'release')
-    needs: [ setup, maven-build-lifecycle, deploy-to-release-candidate ]
-    name: Deploy to Production
-    uses: energyhub/workflow-deploy-infrautils-microservice-s3/.github/workflows/workflow.yml@v1
-    secrets: inherit
-    with:
-      environment: production
-      service: ${{ needs.setup.outputs.service }}
-      vpc: ${{ needs.setup.outputs.production-vpc }}
-      image-tag: ${{ needs.maven-build-lifecycle.outputs.image-tag }}
-
-  release:
-    if:  startsWith(github.ref_name, 'release')
-    needs: [ maven-build-lifecycle, deploy-to-production ]
-    name: Release Tasks
-    runs-on: ubuntu-24.04
-    environment: production
-    env:
-      GH_TOKEN: ${{ github.token }}
-      REVISION: ${{ needs.maven-build-lifecycle.outputs.revision }}
-    steps:
-      - name: Create a Tag for Release
-        uses: actions/github-script@v6
-        with:
-          script: |
-            github.rest.git.createRef({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                ref: 'refs/tags/${{ env.REVISION }}',
-                sha: context.sha
-              })       
-
-      - name: Make a Release
-        run: gh release create "${REVISION}" -t "${REVISION}" --generate-notes -R energyhub/${{ github.event.repository.name }}
+      # slack-prod-deploy-notify-webhook: ${{ needs.setup.outputs.slack-prod-deploy-webhook }}
+      # slack-failure-notify-webhook: ${{ needs.setup.outputs.slack-failure-webhook }}
