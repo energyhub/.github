@@ -1,9 +1,0 @@
-{
-  "name": "EnergyHub Java Maven CD Workflow",
-  "description": "EnergyHub CD starter workflow for Java projects built with Maven, using the shared deploy pipeline (workflow-deploy-pipeline)",
-  "iconName": "energyhub-logo",
-  "categories": [
-    "Java",
-    "Maven POM"
-  ]
-}
